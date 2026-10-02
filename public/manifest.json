@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "GerSaKa - Gerakan Sehat Keluarga LimoCity Therapy",
+  "short_name": "GerSaKa",
+  "description": "Platform infrastruktur kesehatan keluarga LimoCity Therapy dengan pemantauan real-time, jadwal obat, dan akses darurat offline.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0d9488",
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

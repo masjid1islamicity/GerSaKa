@@ -1,0 +1,6 @@
+{
+  "name": "GerSaKa - Gerakan Sehat Keluarga LimoCity Therapy",
+  "description": "Platform infrastruktur kesehatan keluarga LimoCity Therapy dengan pemantauan real-time, prediksi penyakit AI, konsultasi video terenkripsi, darurat faskes, dan sinkronisasi wearable.",
+  "requestFramePermissions": ["camera", "microphone", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
