@@ -12,6 +12,7 @@ import { AiHealthInsights } from "./AiHealthInsights";
 import { AiHealthCoach } from "./AiHealthCoach";
 import { SmartHydrationWidget } from "./SmartHydrationWidget";
 import { DailyWellnessGoal } from "./DailyWellnessGoal";
+import { HealthGoals } from "./HealthGoals";
 import { ProactiveHealthAlertBanner } from "./ProactiveHealthAlertBanner";
 import { ProactiveHealthAlertWidget } from "./ProactiveHealthAlertWidget";
 import { ProactiveHealthAlert } from "../types/proactiveAlerts";
@@ -67,6 +68,8 @@ interface FamilyOverviewProps {
   onOpenOfflineVault?: () => void;
   proactiveAlerts?: ProactiveHealthAlert[];
   onOpenProactiveModal?: () => void;
+  onTriggerGoalsReminderSimulation?: (slot: "10:00" | "20:00") => void;
+  onOpenGoalsNotificationCenter?: () => void;
 }
 
 export const FamilyOverview: React.FC<FamilyOverviewProps> = ({
@@ -89,6 +92,8 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({
   onOpenOfflineVault,
   proactiveAlerts,
   onOpenProactiveModal,
+  onTriggerGoalsReminderSimulation,
+  onOpenGoalsNotificationCenter,
 }) => {
 
   const activeMember = members.find(m => m.id === selectedMemberId) || members[0];
@@ -636,6 +641,26 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({
               </button>
             )}
 
+            {/* Health Goals Shortcut (Air, Langkah & Tidur) */}
+            <button
+              onClick={() => {
+                const el = document.getElementById("health-goals-section");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="flex items-center gap-3 p-3.5 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 hover:from-cyan-700 hover:to-emerald-700 text-white font-semibold text-xs shadow-md shadow-teal-600/20 transition-all active:scale-98 cursor-pointer relative"
+            >
+              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                <Target className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-1">
+                  <p className="font-bold leading-tight">Health Goals</p>
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse" />
+                </div>
+                <p className="text-[10px] text-teal-100 font-normal">Air, Langkah & Tidur</p>
+              </div>
+            </button>
+
             {/* Daily Wellness Goal Shortcut (Air, Langkah, Napas) */}
             <button
               onClick={() => {
@@ -871,6 +896,20 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({
           onOpenAlertModal={onOpenProactiveModal}
           onOpenTeleconsult={onOpenTeleconsult}
           onShowToast={onShowToast}
+        />
+      </div>
+
+      {/* FITUR HEALTH GOALS: TARGET HARIAN AIR, LANGKAH & TIDUR UNTUK SETIAP ANGGOTA KELUARGA */}
+      <div id="health-goals-section">
+        <HealthGoals
+          member={activeMember}
+          allMembers={members}
+          onSelectMember={onSelectMember}
+          onSyncWearable={onSyncWearable}
+          isSyncing={isSyncing}
+          onShowToast={onShowToast}
+          onTriggerReminderSimulation={onTriggerGoalsReminderSimulation}
+          onOpenNotificationCenter={onOpenGoalsNotificationCenter}
         />
       </div>
 

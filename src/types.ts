@@ -18,6 +18,7 @@ export interface VitalsData {
   steps: number;
   activeCalories: number;
   activeMinutes?: number;
+  exerciseMinutes?: number; // Menit durasi olahraga harian (wearable)
   hrvMs: number; // Heart Rate Variability
   stressLevel: number; // 0-100
   timestamp: string;
@@ -66,6 +67,38 @@ export interface PredictionResult {
   generatedAt?: string;
 }
 
+export interface HealthGoalFoodItem {
+  name: string;
+  category: "Sarapan" | "Makan Siang" | "Makan Malam" | "Kudapan / Snack" | "Minuman Pemulihan";
+  nutritionalRole: string;
+  portionTip: string;
+  calories: number;
+  highlightNutrient: string;
+  isSuperfood?: boolean;
+}
+
+export interface HealthGoalFoodSuggestion {
+  goalCategory: "water" | "steps" | "sleep";
+  goalTitle: string;
+  isAchieved: boolean;
+  currentValue: number;
+  targetValue: number;
+  unit: string;
+  progressPercent: number;
+  statusBadge: string;
+  clinicalRationale: string;
+  suggestedFoods: HealthGoalFoodItem[];
+}
+
+export interface FamilySharedMealSuggestion {
+  title: string;
+  menu: string;
+  rationale: string;
+  familyFitNote: string;
+  caloriesPerServing: number;
+  collectiveStatsSummary: string;
+}
+
 export interface NutritionPlan {
   dailyCalorieTarget: number;
   macroSplit: {
@@ -89,6 +122,8 @@ export interface NutritionPlan {
   }>;
   avoidFoods: string[];
   superfoods: string[];
+  goalBasedFoodSuggestions?: HealthGoalFoodSuggestion[];
+  familySharedMealSuggestion?: FamilySharedMealSuggestion;
 }
 
 export interface DoctorSpecialist {
@@ -138,7 +173,7 @@ export interface HospitalInvoice {
 export interface EmergencyFacility {
   id: string;
   name: string;
-  type: "Rumah Sakit Rujukan" | "Puskesmas 24 Jam" | "Klinik Darurat";
+  type: "Rumah Sehat Rujukan" | "Puskesmas 24 Jam" | "Klinik Darurat";
   distanceKm: number;
   etaMinutes: number;
   phone: string;

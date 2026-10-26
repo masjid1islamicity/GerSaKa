@@ -63,7 +63,7 @@ export const DEFAULT_OFFLINE_ICE_CONTACTS: OfflineEmergencyContact[] = [
   },
   {
     id: "ice-04",
-    name: "IGD RS LimoCity Therapy Center",
+    name: "IGD Rumah Sehat LimoCity Therapy Center",
     role: "Instalasi Gawat Darurat & Trauma Center",
     phone: "(021) 7780-8888",
     relation: "Faskes Rujukan Utama",
@@ -77,7 +77,7 @@ export const OFFLINE_FIRST_AID_GUIDELINES: OfflineFirstAidGuide[] = [
     actionSummary: "Hentikan seluruh aktivitas segera, posisikan duduk setengah tegak (posisi Fowler), dan longgarkan pakaian ketat.",
     steps: [
       "Dudukkan penderita dalam posisi setengah berbaring (sudut 45 derajat) dengan bantal menopang punggung.",
-      "Hubungi segera Ambulans 119 atau IGD RS LimoCity (021) 7780-8888.",
+      "Hubungi segera Ambulans 119 atau IGD Rumah Sehat LimoCity (021) 7780-8888.",
       "Jika penderita memiliki resep ISDN (Isosorbide Dinitrate) di bawah lidah dan tekanan darah >100 mmHg, bantu letakkan 1 tablet di bawah lidah.",
       "Pantau kesadaran dan pola nafas. Jangan berikan makanan padat atau minuman dalam volume besar."
     ],
@@ -93,10 +93,10 @@ export const OFFLINE_FIRST_AID_GUIDELINES: OfflineFirstAidGuide[] = [
       "Face: Minta penderita tersenyum, amati apakah salah satu sudut bibir terkulai ke bawah.",
       "Arm: Minta angkat kedua lengan lurus ke depan, amati apakah satu lengan jatuh terkulai lemas.",
       "Speech: Minta ucapkan kalimat sederhana, perhatikan apakah suara pelo atau bicara tidak jelas.",
-      "Time: Catat jam tepat timbulnya gejala (Golden Period trombolisis <4.5 jam). Segera bawa ke IGD RS dengan CT-Scan siap pakai."
+      "Time: Catat jam tepat timbulnya gejala (Golden Period trombolisis <4.5 jam). Segera bawa ke IGD Rumah Sehat dengan CT-Scan siap pakai."
     ],
     contraindications: [
-      "JANGAN memberikan aspirin atau obat pengencer darah sebelum dilakukan CT-Scan di rumah sakit.",
+      "JANGAN memberikan aspirin atau obat pengencer darah sebelum dilakukan CT-Scan di Rumah Sehat.",
       "JANGAN berikan makanan/minuman karena resiko aspirasi paru akibat refleks menelan lumpuh."
     ]
   },

@@ -354,7 +354,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
                   <div className="p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-800/80 text-xs space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold text-slate-700 dark:text-slate-300">
-                        Rumah Sakit Rujukan: {dispatchResult.targetHospital.name}
+                        Rumah Sehat Rujukan: {dispatchResult.targetHospital.name}
                       </span>
                       <span className="text-emerald-600 font-bold">{dispatchResult.targetHospital.phone}</span>
                     </div>
@@ -387,7 +387,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
                       Konfirmasi Panggilan Ambulans 119
                     </h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                      Kondisi Terpilih: <strong className="text-red-600">{selectedConditionTitle}</strong>. Sistem akan mengunci koordinat GPS, menyiarkan status vital ke IGD RS LimoCity dan armada ambulans terdekat.
+                      Kondisi Terpilih: <strong className="text-red-600">{selectedConditionTitle}</strong>. Sistem akan mengunci koordinat GPS, menyiarkan status vital ke IGD Rumah Sehat LimoCity dan armada ambulans terdekat.
                     </p>
                   </div>
 

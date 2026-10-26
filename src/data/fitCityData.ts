@@ -69,7 +69,7 @@ export const INITIAL_FITCITY_REGIONS: FitCityRegion[] = [
         impactDescription: "Katering harian diet jantung dan diabetes untuk 850 pasien rawat jalan.",
         activeBeneficiaries: 850,
         status: "Berjalan Efektif",
-        leaderInCharge: "Instalasi Gizi Klinik RS LimoCity",
+        leaderInCharge: "Instalasi Gizi Klinik Rumah Sehat LimoCity",
       },
     ],
     smartAdvisory: {

@@ -296,7 +296,7 @@ export const ProactiveHealthAlertModal: React.FC<ProactiveHealthAlertModalProps>
                   <div className="space-y-2">
                     <div className="text-[11px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Rencana Tindakan Pencegahan Dini (Mencegah Krisis Rumah Sakit):</span>
+                      <span>Rencana Tindakan Pencegahan Dini (Mencegah Krisis Rumah Sehat):</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

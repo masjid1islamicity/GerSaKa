@@ -76,7 +76,7 @@ export const ProactiveHealthAlertBanner: React.FC<ProactiveHealthAlertBannerProp
             </h3>
 
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              {topAlert.trendAnalysis} <strong>Tindakan pencegahan segera disarankan</strong> untuk menstabilkan kondisi sebelum memerlukan IGD rumah sakit.
+              {topAlert.trendAnalysis} <strong>Tindakan pencegahan segera disarankan</strong> untuk menstabilkan kondisi sebelum memerlukan IGD Rumah Sehat.
             </p>
           </div>
         </div>

@@ -72,7 +72,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-lg">Ekspor Laporan Medis Keluarga</h3>
                 <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">
-                  Standar Faskes RS LimoCity
+                  Standar Faskes Rumah Sehat LimoCity
                 </span>
               </div>
               <p className="text-xs text-emerald-100">
@@ -107,7 +107,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-900 dark:text-white">Format PDF Resmi</p>
-                <p className="text-[11px] text-slate-500">Lengkap kop surat RS, barcode & verifikasi</p>
+                <p className="text-[11px] text-slate-500">Lengkap kop surat Rumah Sehat, barcode & verifikasi</p>
               </div>
             </button>
 
@@ -199,7 +199,7 @@ export const ReportExportModal: React.FC<ReportExportModalProps> = ({
                 </div>
                 <div>
                   <h2 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white uppercase">
-                    RUMAH SAKIT & KLINIK TERAPUTIK LIMOCITY
+                    RUMAH SEHAT & KLINIK TERAPUTIK LIMOCITY
                   </h2>
                   <p className="text-[11px] text-slate-600 dark:text-slate-400">
                     Instalasi Rawat Jalan & Platform Kesehatan Digital GerSaKa • Izin Kemenkes RI No: 445/LMC/2026

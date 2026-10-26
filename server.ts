@@ -225,25 +225,54 @@ Berikan output dalam format JSON murni (tanpa tanda kutip markdown \`\`\`json) d
   }
 });
 
-// Personalized Nutrition & Meal Plan AI
+// Personalized Nutrition & Meal Plan AI based on Health Goals
 app.post("/api/ai/nutrition-plan", async (req, res) => {
   try {
-    const { patient, goal } = req.body;
+    const { patient, goal, healthGoalsContext, familyGoalsSummary } = req.body;
     if (!patient) {
       return res.status(400).json({ error: "Data pasien diperlukan." });
     }
 
+    const waterCurrent = healthGoalsContext?.waterCurrentMl || 1750;
+    const waterTarget = healthGoalsContext?.waterTargetMl || 2500;
+    const waterPct = Math.round((waterCurrent / (waterTarget || 2500)) * 100);
+    const isWaterAchieved = waterPct >= 100;
+
+    const stepsCurrent = healthGoalsContext?.stepsCurrent || patient.vitals?.steps || 7200;
+    const stepsTarget = healthGoalsContext?.stepsTarget || 8000;
+    const stepsPct = Math.round((stepsCurrent / (stepsTarget || 8000)) * 100);
+    const isStepsAchieved = stepsPct >= 100;
+
+    const sleepCurrent = healthGoalsContext?.sleepCurrentHours || patient.vitals?.sleepHours || 7.2;
+    const sleepTarget = healthGoalsContext?.sleepTargetHours || 7.5;
+    const sleepPct = Math.round((sleepCurrent / (sleepTarget || 7.5)) * 100);
+    const isSleepAchieved = sleepPct >= 100;
+
     if (ai) {
-      const prompt = `Anda adalah Ahli Gizi Klinis (Sp.GK) platform GerSaKa LimoCity Therapy.
-Buat rencana nutrisi personal harian dan notifikasi gizi pintar untuk pasien berikut:
+      const prompt = `Anda adalah Ahli Gizi Klinis (Sp.GK) platform Rumah Sehat GerSaKa LimoCity Therapy.
+Buat rencana nutrisi personal harian dan saran makanan spesifik berdasarkan Capaian Target Kesehatan Harian (Health Goals) untuk pasien berikut:
 Nama: ${patient.name}, Usia: ${patient.age}, Profil Kesehatan: ${patient.medicalHistory || "Sehat"}, Target: ${goal || "Kebugaran & Imunitas Keluarga"}.
 Tekanan Darah: ${patient.vitals?.bloodPressure || "120/80"}, Gula Darah: ${patient.vitals?.bloodGlucose || 100} mg/dL.
+
+DATA CAPAIAN HEALTH GOALS HARI INI:
+1. Target Air (Hidrasi): ${waterCurrent} ml / ${waterTarget} ml (${waterPct}% - ${isWaterAchieved ? "GOAL TERCAPAI" : "BELUM TERCAPAI"})
+2. Target Langkah & Aktivitas Fisik: ${stepsCurrent} langkah / ${stepsTarget} langkah (${stepsPct}% - ${isStepsAchieved ? "GOAL TERCAPAI" : "BELUM TERCAPAI"})
+3. Target Waktu Tidur & Istirahat: ${sleepCurrent} jam / ${sleepTarget} jam (${sleepPct}% - ${isSleepAchieved ? "GOAL TERCAPAI" : "KURANG TIDUR"})
+${familyGoalsSummary ? `Ringkasan Keluarga: ${JSON.stringify(familyGoalsSummary)}` : ""}
+
+ATURAN REKOMENDASI MAKANAN BERDASARKAN HEALTH GOALS:
+- Jika Target Langkah Tercapai: rekomendasikan makanan pemulihan glikogen otot, asam amino pemulihan (misal: dada ayam rempah, tempe mendoan oven, pisang mas raja kaya kalium).
+- Jika Target Langkah Kurang: rekomendasikan makanan pengaktif metabolisme ringan & rendah kalori tinggi serat (misal: sup sayur kelor, edamame, teh herbal tanpa gula).
+- Jika Target Air Tercapai: berikan makanan penyeimbang elektrolit seluler (timun, melon, air kelapa muda alami).
+- Jika Target Air Kurang: berikan makanan berkuah padat hidrasi (sayur asam, sup kaldu ayam bening kaya cairan, infused water).
+- Jika Target Tidur Tercapai: fokus makanan penopang energi fokus sirkadian (omega-3, karbohidrat kompleks).
+- Jika Target Tidur Kurang: berikan makanan kaya triptofan & magnesium untuk perbaikan saraf & memicu tidur lelap malam ini (pisang oat, susu kedelai hangat, biji labu).
 
 Keluarkan dalam format JSON murni:
 {
   "dailyCalorieTarget": number,
   "macroSplit": { "carbsPercent": number, "proteinPercent": number, "fatPercent": number, "fiberGrams": number, "waterLiters": number },
-  "keyNutritionalFocus": "Fokus nutrisi utama (contoh: Rendah garam, tinggi antioksidan)",
+  "keyNutritionalFocus": "Fokus nutrisi utama (contoh: Rendah garam, tinggi antioksidan & pemulihan glikogen)",
   "meals": [
     { "time": "07:00", "type": "Sarapan Sehat", "menu": "Deskripsi menu lokal Indonesia lezat bergizi", "calories": number, "tips": "Tips penyajian" },
     { "time": "10:00", "type": "Snack Pagi", "menu": "Snack padat gizi", "calories": number, "tips": "Tips" },
@@ -258,7 +287,39 @@ Keluarkan dalam format JSON murni:
     { "time": "20:30", "message": "Pesan persiapan istirahat optimal" }
   ],
   "avoidFoods": ["makanan pantangan 1", "makanan pantangan 2"],
-  "superfoods": ["superfood 1", "superfood 2"]
+  "superfoods": ["superfood 1", "superfood 2"],
+  "goalBasedFoodSuggestions": [
+    {
+      "goalCategory": "water" | "steps" | "sleep",
+      "goalTitle": "string",
+      "isAchieved": boolean,
+      "currentValue": number,
+      "targetValue": number,
+      "unit": "string",
+      "progressPercent": number,
+      "statusBadge": "Target Tercapai 🎉" | "Perlu Peningkatan ⚠️",
+      "clinicalRationale": "Alasan klinis mengapa makanan ini direkomendasikan terkait status target tersebut",
+      "suggestedFoods": [
+        {
+          "name": "Nama menu/bahan makanan lokal",
+          "category": "Sarapan" | "Makan Siang" | "Makan Malam" | "Kudapan / Snack" | "Minuman Pemulihan",
+          "nutritionalRole": "Peran gizi",
+          "portionTip": "Porsi yang disarankan",
+          "calories": number,
+          "highlightNutrient": "Zat gizi unggulan (misal: Kalium 450mg)",
+          "isSuperfood": boolean
+        }
+      ]
+    }
+  ],
+  "familySharedMealSuggestion": {
+    "title": "Nama hidangan makan malam bersama keluarga",
+    "menu": "Rincian hidangan lengkap ramah seluruh anggota",
+    "rationale": "Mengapa hidangan ini harmonis dengan capaian target seluruh anggota keluarga",
+    "familyFitNote": "Catatan adaptasi porsi/bumbu untuk profil tensi/gula darah keluarga",
+    "caloriesPerServing": number,
+    "collectiveStatsSummary": "Ringkasan capaian kolektif keluarga"
+  }
 }`;
 
       const response = await ai.models.generateContent({
@@ -274,7 +335,7 @@ Keluarkan dalam format JSON murni:
       return res.json({ success: true, data: parsed });
     }
 
-    // Default Fallback Nutrition Plan
+    // Default Fallback Nutrition Plan with Dynamic Health Goals Integration
     return res.json({
       success: true,
       data: {
@@ -284,9 +345,11 @@ Keluarkan dalam format JSON murni:
           proteinPercent: 25,
           fatPercent: 25,
           fiberGrams: 32,
-          waterLiters: 2.7
+          waterLiters: (waterTarget / 1000) || 2.5
         },
-        keyNutritionalFocus: "Antioksidan tinggi, kontrol natrium teratur, dan protein biologis tinggi untuk regenerasi seluler LimoCity.",
+        keyNutritionalFocus: isStepsAchieved 
+          ? "Pemulihan glikogen otot aktif, hidrasi elektrolit seimbang, dan antioksidan seluler Rumah Sehat."
+          : "Stimulasi metabolisme serat tinggi, optimalisasi hidrasi seluler, dan kontrol glukosa darah.",
         meals: [
           {
             time: "07:00",
@@ -312,7 +375,9 @@ Keluarkan dalam format JSON murni:
           {
             time: "16:00",
             type: "Snack Sore",
-            menu: "Jus alpukat tanpa gula pasir (dengan 1 sdt madu hutan mentah) dan segenggam kacang almond panggang.",
+            menu: isStepsAchieved 
+              ? "Pisang panggang madu hutan & segenggam kacang almond panggang pemulihan energi."
+              : "Jus alpukat tanpa gula pasir & irisan apel hijau pengganjal lapar berserat.",
             calories: 220,
             tips: "Lemak tak jenuh tunggal yang melindungi endotel vaskular."
           },
@@ -325,7 +390,7 @@ Keluarkan dalam format JSON murni:
           }
         ],
         smartPushAlerts: [
-          { time: "07:15", message: "☀️ Selamat pagi! Awali hari dengan 300ml air hangat untuk mengaktifkan metabolisme LimoCity." },
+          { time: "07:15", message: "☀️ Selamat pagi! Awali hari dengan 300ml air hangat untuk mengaktifkan metabolisme Rumah Sehat." },
           { time: "11:00", message: "💧 Waktunya hidrasi: Jangan lupa minum segelas air putih untuk menjaga fokus kerja." },
           { time: "15:45", message: "🥗 Hindari camilan tinggi gula sore ini; pilih buah segar untuk mencegah lonjakan insulin." },
           { time: "20:30", message: "🌙 Istirahatkan sistem pencernaan. Teh kamomil hangat direkomendasikan sebelum tidur." }
@@ -341,7 +406,209 @@ Keluarkan dalam format JSON murni:
           "Kunyit & Jahe merah segar",
           "Ikan Kembung / Ikan Laut Lokal",
           "Daun Kelor & Bayam Organik"
-        ]
+        ],
+        goalBasedFoodSuggestions: [
+          {
+            goalCategory: "steps",
+            goalTitle: "Target Langkah Harian (Aktivitas Fisik)",
+            isAchieved: isStepsAchieved,
+            currentValue: stepsCurrent,
+            targetValue: stepsTarget,
+            unit: "langkah",
+            progressPercent: stepsPct,
+            statusBadge: isStepsAchieved ? "Target Tercapai 🎉" : "Perlu Peningkatan ⚠️",
+            clinicalRationale: isStepsAchieved
+              ? "Aktivitas fisik optimal telah dicapai. Tubuh membutuhkan asupan protein bernilai biologis tinggi dan karbohidrat kompleks untuk mengisi ulang glikogen otot serta memfasilitasi perbaikan mikrotulang dan sendi."
+              : "Langkah harian belum memenuhi ambang pembakaran kalori optimal. Disarankan menu kaya serat larut air dan pemacu termogenesis ringan untuk mempertahankan laju metabolisme tanpa memicu timbunan lemak.",
+            suggestedFoods: isStepsAchieved ? [
+              {
+                name: "Dada Ayam Panggang Bumbu Kunyit Rempah",
+                category: "Makan Malam",
+                nutritionalRole: "Protein biologis tinggi (28g) untuk sintesis protein otot tanpa lemak jenuh.",
+                portionTip: "1 potong (120g) dengan rempah kunyit sebagai antiinflamasi alami.",
+                calories: 195,
+                highlightNutrient: "Protein 28g & Kurkuminoid",
+                isSuperfood: true
+              },
+              {
+                name: "Pisang Mas Raja & Segelas Susu Kedelai Murni",
+                category: "Kudapan / Snack",
+                nutritionalRole: "Kalium tinggi mencegah kram pasca melangkah dan menormalkan pompa natrium-kalium.",
+                portionTip: "1 buah pisang ukuran sedang + 200ml susu kedelai tanpa gula.",
+                calories: 165,
+                highlightNutrient: "Kalium 460mg & BCAA Nabati",
+                isSuperfood: false
+              },
+              {
+                name: "Tempe Mendoan Oven (Non-Jelantah) & Sambal Kecap Tomat",
+                category: "Kudapan / Snack",
+                nutritionalRole: "Isoflavon dan protein fermentasi ramah mikrobioma usus.",
+                portionTip: "2 lembar dipanggang dengan olesan minyak kelapa murni.",
+                calories: 140,
+                highlightNutrient: "Isoflavon & Kalsium 120mg",
+                isSuperfood: true
+              }
+            ] : [
+              {
+                name: "Mangkuk Sayur Bening Daun Kelor & Jagung Manis",
+                category: "Makan Siang",
+                nutritionalRole: "Antioksidan tinggi quercetin dan klorofil memacu pembersihan metabolik tubuh saat kurang gerak.",
+                portionTip: "1 mangkuk sedang kuah bening segar.",
+                calories: 75,
+                highlightNutrient: "Quercetin & Serat Larut 4g",
+                isSuperfood: true
+              },
+              {
+                name: "Seduhan Teh Hijau Serai & Jahe Hangat",
+                category: "Minuman Pemulihan",
+                nutritionalRole: "EGCG dan gingerol menaikkan resting metabolic rate (RMR) tanpa beban gula.",
+                portionTip: "1 cangkir tanpa pemanis sintetis.",
+                calories: 15,
+                highlightNutrient: "EGCG Polifenol & Gingerol",
+                isSuperfood: false
+              },
+              {
+                name: "Tumis Tahu Jamur Tiram Bawang Putih",
+                category: "Makan Malam",
+                nutritionalRole: "Beta-glukan jamur mendukung kekebalan dan protein tahu rendah kalori.",
+                portionTip: "1 porsi kecil dengan minyak wijen sedikit.",
+                calories: 120,
+                highlightNutrient: "Beta-Glukan & Kalori Ringan",
+                isSuperfood: false
+              }
+            ]
+          },
+          {
+            goalCategory: "water",
+            goalTitle: "Target Asupan Cairan (Hidrasi)",
+            isAchieved: isWaterAchieved,
+            currentValue: waterCurrent,
+            targetValue: waterTarget,
+            unit: "ml",
+            progressPercent: waterPct,
+            statusBadge: isWaterAchieved ? "Target Tercapai 🎉" : "Perlu Peningkatan ⚠️",
+            clinicalRationale: isWaterAchieved
+              ? "Capaian hidrasi harian sangat baik. Makanan penunjang difokuskan pada menjaga keseimbangan osmotik dan elektrolit intraseluler agar tidak terjadi hemodilusi."
+              : "Asupan cairan masih di bawah rekomendasi klinis. Selain menambah air putih, konsumsi sayur dan buah berkadar air tinggi (>90%) adalah strategi efektif mendongkrak hidrasi jaringan.",
+            suggestedFoods: isWaterAchieved ? [
+              {
+                name: "Air Kelapa Muda Murni Segar",
+                category: "Minuman Pemulihan",
+                nutritionalRole: "Sumber isotipik alami kalium, natrium, kalsium, dan magnesium seimbang.",
+                portionTip: "1 gelas (250ml) dingin tanpa es buatan dan tanpa sirup.",
+                calories: 45,
+                highlightNutrient: "Elektrolit Lengkap & Kalium 600mg",
+                isSuperfood: true
+              },
+              {
+                name: "Potongan Melon Madu & Timun Kyuri Dingin",
+                category: "Kudapan / Snack",
+                nutritionalRole: "Silika alami dan air terstruktur menjaga elastisitas kulit dan endotel.",
+                portionTip: "1 mangkuk kecil (150g) dingin.",
+                calories: 60,
+                highlightNutrient: "Kadar Air 93% & Silika",
+                isSuperfood: false
+              }
+            ] : [
+              {
+                name: "Sayur Kuah Asem Bening Labu Siam & Jagung",
+                category: "Makan Siang",
+                nutritionalRole: "Menyumbang 350ml cairan terhidrasi penuh mineral larut air.",
+                portionTip: "1 mangkuk besar dengan kuah asam tamarind segar.",
+                calories: 85,
+                highlightNutrient: "Cairan 350ml & Vitamin C",
+                isSuperfood: false
+              },
+              {
+                name: "Semangka Merah Dingin Potong Dadu",
+                category: "Kudapan / Snack",
+                nutritionalRole: "Kandungan air 92% disertai L-sitrulin yang memperlancar mikrosirkulasi kapiler.",
+                portionTip: "2 potong segitiga (200g).",
+                calories: 65,
+                highlightNutrient: "Kadar Air 92% & L-Sitrulin",
+                isSuperfood: true
+              },
+              {
+                name: "Infused Water Stroberi, Timun & Daun Mint",
+                category: "Minuman Pemulihan",
+                nutritionalRole: "Menstimulasi refleks haus dengan rasa segar alami tanpa kalori.",
+                portionTip: "500ml botol minum dingin isi ulang.",
+                calories: 10,
+                highlightNutrient: "Hidrasi Seluler & Mentol Segar",
+                isSuperfood: false
+              }
+            ]
+          },
+          {
+            goalCategory: "sleep",
+            goalTitle: "Target Waktu Tidur & Istirahat",
+            isAchieved: isSleepAchieved,
+            currentValue: sleepCurrent,
+            targetValue: sleepTarget,
+            unit: "jam",
+            progressPercent: sleepPct,
+            statusBadge: isSleepAchieved ? "Target Tercapai 🎉" : "Perlu Peningkatan ⚠️",
+            clinicalRationale: isSleepAchieved
+              ? "Durasi tidur restoratif telah terpenuhi. Otak dan metabolisme siap menyerap nutrisi kompleks untuk ketahanan energi sirkadian."
+              : "Durasi tidur semalam belum ideal sehingga kadar kortisol pagi cenderung meningkat. Dibutuhkan makanan tinggi magnesium dan triptofan untuk meredakan ketegangan sistem saraf otonom.",
+            suggestedFoods: isSleepAchieved ? [
+              {
+                name: "Nasi Merah Organik dengan Pepes Ikan Tenggiri Kemangi",
+                category: "Makan Siang",
+                nutritionalRole: "DHA dan asam lemak esensial mengoptimalkan plastisitas sinaptik saat bangun tidur.",
+                portionTip: "1 porsi sedang dengan lalapan kukus.",
+                calories: 420,
+                highlightNutrient: "Omega-3 DHA & Vitamin B Kompleks",
+                isSuperfood: true
+              },
+              {
+                name: "Segenggam Kacang Walnut & Almond Panggang",
+                category: "Kudapan / Snack",
+                nutritionalRole: "Menjaga glukosa darah stabil dan fokus kognitif siang hari.",
+                portionTip: "20-25 gram tanpa garam tambahan.",
+                calories: 140,
+                highlightNutrient: "Asam Alfa-Linolenat & Vitamin E",
+                isSuperfood: true
+              }
+            ] : [
+              {
+                name: "Sup Labu Kuning Hangat dengan Tahu Sutra",
+                category: "Makan Malam",
+                nutritionalRole: "Asam amino L-triptofan pada labu dan tahu memicu pembentukan melatonin alami untuk tidur nyenyak nanti malam.",
+                portionTip: "1 mangkuk hangat dinikmati 2 jam sebelum tidur.",
+                calories: 130,
+                highlightNutrient: "L-Triptofan & Karotenoid",
+                isSuperfood: true
+              },
+              {
+                name: "Seduhan Susu Kedelai / Almond Hangat Kayu Manis",
+                category: "Minuman Pemulihan",
+                nutritionalRole: "Magnesium tinggi menenangkan reseptor GABA dan merilekskan otot tegang akibat kurang tidur.",
+                portionTip: "1 cangkir (200ml) hangat dengan taburan kayu manis.",
+                calories: 90,
+                highlightNutrient: "Magnesium 65mg & Efek Relaksasi",
+                isSuperfood: false
+              },
+              {
+                name: "2 Buah Kiwi Hijau Segar",
+                category: "Kudapan / Snack",
+                nutritionalRole: "Studi klinis membuktikan konsumsi kiwi sebelum tidur menaikkan efisiensi tidur hingga 13%.",
+                portionTip: "2 buah kiwi dikupas saat sore/malam hari.",
+                calories: 84,
+                highlightNutrient: "Serotonin Alami & Folat",
+                isSuperfood: true
+              }
+            ]
+          }
+        ],
+        familySharedMealSuggestion: {
+          title: "Menu Makan Malam Keluarga Sehat: Sup Ikan Kuah Bening Rempah & Pepes Tahu Daun Kemangi",
+          menu: "Sup Fillet Ikan Kakap Bening (kuah jahe, sereh, tomat ceri, dan daun kemangi) + Pepes Tahu Jamur Kukus + Cah Buncis Jagung Manis + Nasi Merah Hangat.",
+          rationale: "Menu ini dirancang secara sinergis menyatukan capaian target keluarga: kuah kaldu rempah kaya cairan untuk hidrasi, protein ikan rendah lemak untuk pemulihan langkah Ayah dan Anak, serta kalsium tahu dan kalium tinggi yang menenangkan tensi darah dan mempersiapkan tidur pulas seluruh keluarga.",
+          familyFitNote: "Rendah natrium (<300mg per porsi) sangat aman bagi tensi Ayah Hendra, kaya kalsium bioavailable untuk kesehatan tulang Ibu Siti dan Kakek, serta menyuplai asam amino pemulihan otot untuk anak-anak.",
+          caloriesPerServing: 460,
+          collectiveStatsSummary: "Disesuaikan dengan pencapaian langkah harian dan kebutuhan hidrasi bersama keluarga hari ini."
+        }
       }
     });
   } catch (error: any) {
@@ -1813,6 +2080,7 @@ app.post(["/api/wearable/sync", "/api/sync/wearable"], (req, res) => {
   const sleepScore = Math.floor(75 + Math.random() * 20);
   const steps = Math.floor(5500 + Math.random() * 3500);
   const calories = Math.floor(380 + Math.random() * 220);
+  const exerciseMinutes = Math.floor(30 + Math.random() * 40); // 30-70 mins of daily exercise
   const stressLevel = Math.floor(18 + Math.random() * 18);
   const temperature = parseFloat((36.4 + Math.random() * 0.4).toFixed(1));
 
@@ -1826,6 +2094,8 @@ app.post(["/api/wearable/sync", "/api/sync/wearable"], (req, res) => {
     sleepScore,
     steps,
     calories,
+    exerciseMinutes,
+    activeMinutes: exerciseMinutes,
     stressLevel,
     temperature,
   };

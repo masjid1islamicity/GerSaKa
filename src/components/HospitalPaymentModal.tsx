@@ -70,13 +70,13 @@ export const HospitalPaymentModal: React.FC<HospitalPaymentModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-lg">Sistem Pembayaran Terintegrasi RS</h3>
+                <h3 className="font-bold text-lg">Sistem Pembayaran Terintegrasi Rumah Sehat</h3>
                 <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">
                   Payment Gateway LimoCity
                 </span>
               </div>
               <p className="text-xs text-blue-100">
-                Administrasi Rumah Sakit, Telekonsultasi, Terapi & Obat Farmasi
+                Administrasi Rumah Sehat, Telekonsultasi, Terapi & Obat Farmasi
               </p>
             </div>
           </div>
@@ -160,18 +160,18 @@ export const HospitalPaymentModal: React.FC<HospitalPaymentModalProps> = ({
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
                   <h4 className="text-base font-bold text-slate-900 dark:text-white">
-                    Pembayaran Rumah Sakit Telah Terverifikasi Sah
+                    Pembayaran Rumah Sehat Telah Terverifikasi Sah
                   </h4>
                   <p className="text-xs text-slate-500 max-w-md mx-auto">
-                    Tagihan {selectedInvoice.invoiceNumber} sebesar Rp {selectedInvoice.amount.toLocaleString("id-ID")} telah lunas tercatat di sistem administrasi LimoCity Hospital.
+                    Tagihan {selectedInvoice.invoiceNumber} sebesar Rp {selectedInvoice.amount.toLocaleString("id-ID")} telah lunas tercatat di sistem administrasi Rumah Sehat LimoCity.
                   </p>
                   <div className="pt-2 flex justify-center gap-2">
                     <button
-                      onClick={() => alert("Mengunduh Bukti Pembayaran Resmi RS LimoCity (PDF)...")}
+                      onClick={() => alert("Mengunduh Bukti Pembayaran Resmi Rumah Sehat LimoCity (PDF)...")}
                       className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                     >
                       <Download className="w-3.5 h-3.5" />
-                      <span>Unduh Kuitansi Sah RS LimoCity</span>
+                      <span>Unduh Kuitansi Sah Rumah Sehat LimoCity</span>
                     </button>
                   </div>
                 </div>
@@ -229,7 +229,7 @@ export const HospitalPaymentModal: React.FC<HospitalPaymentModalProps> = ({
                   {paymentMethod === "bca_va" && (
                     <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                       <div>
-                        <span className="text-[11px] text-slate-500">Nomor Virtual Account BCA RS LimoCity</span>
+                        <span className="text-[11px] text-slate-500">Nomor Virtual Account BCA Rumah Sehat LimoCity</span>
                         <p className="text-lg font-mono font-bold text-slate-900 dark:text-white">
                           88014-9923841029
                         </p>
@@ -271,7 +271,7 @@ export const HospitalPaymentModal: React.FC<HospitalPaymentModalProps> = ({
                     disabled={paying}
                     className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <span>{paying ? "Memproses Verifikasi Rumah Sakit..." : `Konfirmasi & Bayar Rp ${selectedInvoice.amount.toLocaleString("id-ID")}`}</span>
+                    <span>{paying ? "Memproses Verifikasi Rumah Sehat..." : `Konfirmasi & Bayar Rp ${selectedInvoice.amount.toLocaleString("id-ID")}`}</span>
                   </button>
                 </div>
               )}

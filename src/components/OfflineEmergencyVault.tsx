@@ -670,7 +670,7 @@ export const OfflineEmergencyVault: React.FC<OfflineEmergencyVaultProps> = ({
               <div>
                 <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-1.5">
                   <Hospital className="w-4 h-4 text-teal-600" />
-                  <span>Daftar Rumah Sakit & Faskes 24 Jam Terdekat</span>
+                  <span>Daftar Rumah Sehat & Faskes 24 Jam Terdekat</span>
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

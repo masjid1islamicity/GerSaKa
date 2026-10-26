@@ -190,7 +190,7 @@ export const ProactiveHealthAlertWidget: React.FC<ProactiveHealthAlertWidgetProp
             </h2>
 
             <p className="text-xs text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
-              Menganalisis tren tanda vital longitudinal secara cerdas menggunakan AI untuk mendeteksi deviasi anomali tersembunyi <strong>sebelum mencapai tahap kritis/darurat</strong> rumah sakit pada <strong>{member.name}</strong> ({member.role}).
+              Menganalisis tren tanda vital longitudinal secara cerdas menggunakan AI untuk mendeteksi deviasi anomali tersembunyi <strong>sebelum mencapai tahap kritis/darurat</strong> Rumah Sehat pada <strong>{member.name}</strong> ({member.role}).
             </p>
           </div>
         </div>

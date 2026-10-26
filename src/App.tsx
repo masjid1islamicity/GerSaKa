@@ -25,6 +25,11 @@ import {
   saveStoredProactiveAlerts,
   playProactiveAlertChime
 } from "./utils/proactiveAlertEngine";
+import { 
+  useHealthGoalsScheduler, 
+  HealthGoalsReminderBanner, 
+  HealthGoalsNotificationDrawer 
+} from "./components/HealthGoalsNotificationSystem";
 
 import { INITIAL_FAMILY_MEMBERS, INITIAL_MEDICATIONS } from "./data/mockData";
 import { FamilyMember, MedicationItem } from "./types";
@@ -127,6 +132,33 @@ export default function App() {
   const [lastSyncTimestamp, setLastSyncTimestamp] = useState<number>(Date.now());
   const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "info" | "warning" } | null>(null);
 
+  // Health Goals Push Notification System (10 AM & 8 PM reminders for progress < 50%)
+  const [isGoalsNotifDrawerOpen, setIsGoalsNotifDrawerOpen] = useState(false);
+  const {
+    activeAlert: healthGoalsAlert,
+    dismissAlert: dismissHealthGoalsAlert,
+    reminderHistory: healthGoalsReminderHistory,
+    soundEnabled: goalsNotifSoundEnabled,
+    toggleSound: toggleGoalsNotifSound,
+    webPushPermission: goalsWebPushPermission,
+    requestWebPush: requestGoalsWebPush,
+    triggerSimulation: triggerGoalsReminderSimulation,
+    handleQuickAddWater: handleGoalsQuickAddWater,
+    clearReminderHistory: clearGoalsReminderHistory,
+  } = useHealthGoalsScheduler({
+    members,
+    activeMemberId: selectedMemberId,
+    onShowToast: (msg, type) => showToast(msg, type),
+    onNavigateToGoals: (memberId) => {
+      setSelectedMemberId(memberId);
+      setCurrentTab("family");
+      setTimeout(() => {
+        const el = document.getElementById("health-goals-section");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  });
+
   // Active Member selector
   const activeMember = members.find(m => m.id === selectedMemberId) || members[0];
 
@@ -211,8 +243,34 @@ export default function App() {
           }
           return m;
         }));
+
+        // Persist updated wearable metrics (steps, sleep, and exercise duration) into Health Goals storage
+        try {
+          const STORAGE_KEY_PROGRESS = "gersaka_health_goals_progress_v1";
+          const savedProgress = localStorage.getItem(STORAGE_KEY_PROGRESS);
+          const progressObj = savedProgress ? JSON.parse(savedProgress) : {};
+          const existing = progressObj[activeMember.id] || {
+            waterCurrentMl: 1750,
+            streakDays: 5,
+          };
+          const syncedExercise = data.vitals.activeMinutes ?? existing.exerciseCurrentMinutes ?? 35;
+          progressObj[activeMember.id] = {
+            ...existing,
+            stepsCurrent: data.vitals.steps ?? existing.stepsCurrent ?? 7200,
+            sleepCurrentHours: data.vitals.sleepHours ?? existing.sleepCurrentHours ?? 7.2,
+            exerciseCurrentMinutes: syncedExercise,
+            lastUpdatedTime: nowTime,
+          };
+          localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(progressObj));
+        } catch (storageErr) {
+          console.warn("Could not save progress to localStorage:", storageErr);
+        }
+
         setLastSyncTimestamp(Date.now());
-        showToast(`Sinkronisasi telemetri ${activeMember.name} selesai. Data terbaru tersimpan terenkripsi.`, "success");
+        showToast(
+          `⚡ Wearable ${activeMember.name} tersinkron: ${data.vitals.steps?.toLocaleString("id-ID")} langkah & ${data.vitals.activeMinutes || 40} menit olahraga terintegrasi ke Health Goals!`, 
+          "success"
+        );
       }
     } catch (err) {
       console.error("Wearable sync error:", err);
@@ -438,6 +496,22 @@ export default function App() {
         </div>
       )}
 
+      {/* Scheduled Health Goals Push Banner (10 AM & 8 PM reminders for progress < 50%) */}
+      <HealthGoalsReminderBanner
+        alert={healthGoalsAlert}
+        onDismiss={dismissHealthGoalsAlert}
+        onNavigateToGoals={(mId) => {
+          setSelectedMemberId(mId);
+          setCurrentTab("family");
+          setTimeout(() => {
+            const el = document.getElementById("health-goals-section");
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+          }, 100);
+        }}
+        onQuickAddWater={handleGoalsQuickAddWater}
+        onOpenCenter={() => setIsGoalsNotifDrawerOpen(true)}
+      />
+
       {/* Main Top Navigation Header */}
       <Navbar
         currentTab={currentTab}
@@ -488,6 +562,8 @@ export default function App() {
             onOpenOfflineVault={() => setIsOfflineVaultOpen(true)}
             proactiveAlerts={proactiveAlerts}
             onOpenProactiveModal={() => setIsProactiveAlertModalOpen(true)}
+            onTriggerGoalsReminderSimulation={triggerGoalsReminderSimulation}
+            onOpenGoalsNotificationCenter={() => setIsGoalsNotifDrawerOpen(true)}
           />
         )}
 
@@ -535,7 +611,7 @@ export default function App() {
               <div>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <CreditCard className="w-5 h-5 text-blue-600" />
-                  <span>Portal Administrasi & Pembayaran RS LimoCity</span>
+                  <span>Portal Administrasi & Pembayaran Rumah Sehat LimoCity</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">
                   Kelola tagihan perawatan medis, e-resep farmasi, sesi terapi, dan integrasi penjaminan BPJS Kesehatan keluarga Anda.
@@ -624,6 +700,7 @@ export default function App() {
         isOpen={isNutritionOpen}
         onClose={() => setIsNutritionOpen(false)}
         patient={activeMember}
+        allMembers={members}
       />
 
       {/* 3. Emergency SOS & Nearest Faskes Dispatch Modal */}
@@ -730,6 +807,32 @@ export default function App() {
         }}
         onShowToast={showToast}
         onSimulateScenario={handleSimulateAlertScenario}
+      />
+
+      {/* 12. Health Goals Push Notification & Reminder Center Drawer */}
+      <HealthGoalsNotificationDrawer
+        isOpen={isGoalsNotifDrawerOpen}
+        onClose={() => setIsGoalsNotifDrawerOpen(false)}
+        notifications={[]}
+        onMarkAllAsRead={() => {}}
+        onClearNotifications={() => {}}
+        onTriggerTestNotification={() => triggerGoalsReminderSimulation("10:00")}
+        soundEnabled={goalsNotifSoundEnabled}
+        onToggleSound={toggleGoalsNotifSound}
+        webPushPermission={goalsWebPushPermission}
+        onRequestWebPush={requestGoalsWebPush}
+        reminderHistory={healthGoalsReminderHistory}
+        onTriggerScheduledSimulation={triggerGoalsReminderSimulation}
+        onClearReminderHistory={clearGoalsReminderHistory}
+        onNavigateToGoals={(mId) => {
+          setSelectedMemberId(mId);
+          setCurrentTab("family");
+          setIsGoalsNotifDrawerOpen(false);
+          setTimeout(() => {
+            const el = document.getElementById("health-goals-section");
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+          }, 100);
+        }}
       />
 
     </div>
