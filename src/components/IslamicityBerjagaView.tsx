@@ -48,7 +48,8 @@ import {
   Eye,
   Smile,
   Zap,
-  Target
+  Target,
+  Crown
 } from "lucide-react";
 import { fireBadgeCelebrationConfetti, fireGrandCelebration } from "../utils/confetti";
 import { playHydrationSoundChime } from "../utils/smartHydration";
@@ -62,6 +63,7 @@ interface IslamicityBerjagaViewProps {
   onNavigateToDoctor?: () => void;
   onSyncWearable?: () => void;
   isSyncing?: boolean;
+  onOpenHariKesehatan?: () => void;
 }
 
 export const IslamicityBerjagaView: React.FC<IslamicityBerjagaViewProps> = ({
@@ -73,6 +75,7 @@ export const IslamicityBerjagaView: React.FC<IslamicityBerjagaViewProps> = ({
   onNavigateToDoctor,
   onSyncWearable,
   isSyncing = false,
+  onOpenHariKesehatan,
 }) => {
   const activeMember = useMemo(() => {
     return members.find(m => m.id === selectedMemberId) || members[0];
@@ -494,6 +497,56 @@ export const IslamicityBerjagaView: React.FC<IslamicityBerjagaViewProps> = ({
 
         </div>
 
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 1.5 PERINGATAN HARI KESEHATAN INDONESIA (12 NOVEMBER) - FIT MAHKOTA JIHAD */}
+      {/* ========================================================================= */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-900/40 via-emerald-950/60 to-slate-900 border border-amber-500/40 dark:border-amber-500/30 p-5 shadow-lg">
+        {/* Glow Effects */}
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          <div className="space-y-2.5 max-w-3xl">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-400 text-slate-950 uppercase tracking-wider shadow-sm">
+                <Crown className="w-3.5 h-3.5 text-slate-950" />
+                <span>12 November • Hari Kesehatan Indonesia</span>
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                Pilar Syar'i & Sunnah
+              </span>
+            </div>
+
+            <div>
+              <h2 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2">
+                <span>Fit Mahkota Jihad di Jalan Allah dengan Harta & Jiwaraga</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-amber-200/90 font-medium italic mt-0.5">
+                "الصِّحَّةُ تَاجٌ عَلَى رُؤُوسِ الأَصِحَّاءِ لاَ يَرَاهَا إِلاَّ الْمَرْضَى" — Kesehatan adalah mahkota di atas kepala hamba yang sehat.
+              </p>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Kesehatan raga bukan sekadar angka biologis, melainkan modalitas ibadah dan jihad syar'i (QS. As-Saff: 11 & QS. At-Taubah: 41). Tegakkan 7 pilar BERJAGA — bergerak lincah, bekerja amanah, sunnah berbekam, berdakwah santun, syariah konsisten, jamaah kompak, dan muamalah berkah hingga bahagia sejahtera.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            {onOpenHariKesehatan && (
+              <button
+                type="button"
+                onClick={onOpenHariKesehatan}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-emerald-500 hover:from-amber-300 hover:to-emerald-400 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-amber-500/20 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <Crown className="w-4 h-4 text-slate-950" />
+                <span>Buka Sertifikat & Ikrar 12 Nov</span>
+                <ChevronRight className="w-4 h-4 text-slate-950" />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* ========================================================================= */}

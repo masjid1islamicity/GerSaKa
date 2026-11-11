@@ -34,12 +34,14 @@ import {
 import { fireBadgeCelebrationConfetti, fireGrandCelebration } from "../utils/confetti";
 import { playCelebrationChime } from "./HealthGoalsNotificationSystem";
 import { WeeklyHealthGoalsTrends } from "./WeeklyHealthGoalsTrends";
+import { CumulativeWeeklyExerciseProgress } from "./CumulativeWeeklyExerciseProgress";
 
 export interface MemberGoalSettings {
   waterTargetMl: number;
   stepsTarget: number;
   sleepTargetHours: number;
-  exerciseTargetMinutes: number; // Durasi Olahraga (menit)
+  exerciseTargetMinutes: number; // Durasi Olahraga harian (menit)
+  weeklyCumulativeExerciseTargetMinutes?: number; // Target Mingguan Kumulatif Durasi Olahraga (menit)
 }
 
 export interface MemberGoalProgress {
@@ -66,11 +68,11 @@ const STORAGE_KEY_SETTINGS = "gersaka_health_goals_settings_v1";
 const STORAGE_KEY_PROGRESS = "gersaka_health_goals_progress_v1";
 
 const DEFAULT_GOAL_SETTINGS: Record<string, MemberGoalSettings> = {
-  "fam-01": { waterTargetMl: 2500, stepsTarget: 8000, sleepTargetHours: 7.5, exerciseTargetMinutes: 45 }, // Ayah Hendra (Hipertensi, butuh kardio & mobilitas sedang)
-  "fam-02": { waterTargetMl: 2200, stepsTarget: 7500, sleepTargetHours: 8.0, exerciseTargetMinutes: 30 }, // Ibu Siti (Osteoarthritis, senam sendi & jalan terarah)
-  "fam-03": { waterTargetMl: 2800, stepsTarget: 10000, sleepTargetHours: 8.0, exerciseTargetMinutes: 60 }, // Dimas (Pemuda/atlet, lari & latihan beban)
-  "fam-04": { waterTargetMl: 2000, stepsTarget: 7000, sleepTargetHours: 8.5, exerciseTargetMinutes: 40 }, // Nadia (Pelajar, senam postur tubuh & aerobik ringan)
-  "fam-05": { waterTargetMl: 1900, stepsTarget: 5000, sleepTargetHours: 7.5, exerciseTargetMinutes: 25 }, // Kakek Subroto (Lansia, senam tera & peregangan)
+  "fam-01": { waterTargetMl: 2500, stepsTarget: 8000, sleepTargetHours: 7.5, exerciseTargetMinutes: 45, weeklyCumulativeExerciseTargetMinutes: 315 }, // Ayah Hendra (Hipertensi, butuh kardio & mobilitas sedang)
+  "fam-02": { waterTargetMl: 2200, stepsTarget: 7500, sleepTargetHours: 8.0, exerciseTargetMinutes: 30, weeklyCumulativeExerciseTargetMinutes: 210 }, // Ibu Siti (Osteoarthritis, senam sendi & jalan terarah)
+  "fam-03": { waterTargetMl: 2800, stepsTarget: 10000, sleepTargetHours: 8.0, exerciseTargetMinutes: 60, weeklyCumulativeExerciseTargetMinutes: 420 }, // Dimas (Pemuda/atlet, lari & latihan beban)
+  "fam-04": { waterTargetMl: 2000, stepsTarget: 7000, sleepTargetHours: 8.5, exerciseTargetMinutes: 40, weeklyCumulativeExerciseTargetMinutes: 280 }, // Nadia (Pelajar, senam postur tubuh & aerobik ringan)
+  "fam-05": { waterTargetMl: 1900, stepsTarget: 5000, sleepTargetHours: 7.5, exerciseTargetMinutes: 25, weeklyCumulativeExerciseTargetMinutes: 175 }, // Kakek Subroto (Lansia, senam tera & peregangan)
 };
 
 export const HealthGoals: React.FC<HealthGoalsProps> = ({
@@ -130,6 +132,7 @@ export const HealthGoals: React.FC<HealthGoalsProps> = ({
   const [tempStepsTarget, setTempStepsTarget] = useState(8000);
   const [tempSleepTarget, setTempSleepTarget] = useState(7.5);
   const [tempExerciseTarget, setTempExerciseTarget] = useState(45);
+  const [tempWeeklyExerciseTarget, setTempWeeklyExerciseTarget] = useState(315);
 
   // Sync vitals from wearable into step count, sleep hours, and exercise duration when wearable data changes
   useEffect(() => {
@@ -180,7 +183,8 @@ export const HealthGoals: React.FC<HealthGoalsProps> = ({
     waterTargetMl: 2500,
     stepsTarget: 8000,
     sleepTargetHours: 8.0,
-    exerciseTargetMinutes: 45
+    exerciseTargetMinutes: 45,
+    weeklyCumulativeExerciseTargetMinutes: 315,
   };
 
   const activeProgress = goalProgress[member.id] || {
@@ -316,13 +320,15 @@ export const HealthGoals: React.FC<HealthGoalsProps> = ({
       waterTargetMl: 2500,
       stepsTarget: 8000,
       sleepTargetHours: 7.5,
-      exerciseTargetMinutes: 45
+      exerciseTargetMinutes: 45,
+      weeklyCumulativeExerciseTargetMinutes: 315,
     };
     setEditingMemberId(targetMemberId);
     setTempWaterTarget(st.waterTargetMl);
     setTempStepsTarget(st.stepsTarget);
     setTempSleepTarget(st.sleepTargetHours);
     setTempExerciseTarget(st.exerciseTargetMinutes || 45);
+    setTempWeeklyExerciseTarget(st.weeklyCumulativeExerciseTargetMinutes || ((st.exerciseTargetMinutes || 45) * 7));
     setIsSettingsModalOpen(true);
   };
 
@@ -334,12 +340,13 @@ export const HealthGoals: React.FC<HealthGoalsProps> = ({
         stepsTarget: tempStepsTarget,
         sleepTargetHours: tempSleepTarget,
         exerciseTargetMinutes: tempExerciseTarget,
+        weeklyCumulativeExerciseTargetMinutes: tempWeeklyExerciseTarget,
       }
     }));
     setIsSettingsModalOpen(false);
     if (onShowToast) {
       const mName = allMembers.find(m => m.id === editingMemberId)?.name || "Anggota";
-      onShowToast(`Target kesehatan harian (termasuk durasi olahraga ${tempExerciseTarget} mnt) untuk ${mName} berhasil disesuaikan!`, "success");
+      onShowToast(`Target kesehatan harian & target mingguan kumulatif (${tempWeeklyExerciseTarget} mnt) untuk ${mName} berhasil disesuaikan!`, "success");
     }
   };
 
@@ -614,6 +621,21 @@ export const HealthGoals: React.FC<HealthGoalsProps> = ({
             </div>
 
           </div>
+
+          {/* ========================================================================= */}
+          {/* FITUR TARGET MINGGUAN KUMULATIF: PROGRES MELINGKAR 7 HARI & PERSENTASE MINGGUAN VS HARIAN */}
+          {/* ========================================================================= */}
+          <CumulativeWeeklyExerciseProgress
+            member={member}
+            allMembers={allMembers}
+            goalSettings={activeSettings}
+            goalProgress={activeProgress}
+            onSelectMember={onSelectMember}
+            onAddExerciseMinutes={handleAddExercise}
+            onOpenSettings={() => openSettings(member.id)}
+            onSyncWearable={onSyncWearable}
+            isSyncing={isSyncing}
+          />
 
           {/* THE 4 CORE GOAL PROGRESS CARDS (AIR, LANGKAH, TIDUR, DURASI OLAHRAGA) */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
@@ -1412,6 +1434,51 @@ export const HealthGoals: React.FC<HealthGoalsProps> = ({
                       {val} mnt
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Target Mingguan Kumulatif Durasi Olahraga (7 Hari) */}
+              <div className="space-y-1.5 p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60">
+                <label className="font-bold text-slate-800 dark:text-slate-200 text-xs flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Target Mingguan Kumulatif (Menit/7 Hari):</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-amber-600 dark:text-amber-400 font-semibold">
+                    ≈ {(tempWeeklyExerciseTarget / 7).toFixed(0)} mnt/hari
+                  </span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    step="15"
+                    min="60"
+                    max="1000"
+                    value={tempWeeklyExerciseTarget}
+                    onChange={(e) => setTempWeeklyExerciseTarget(Number(e.target.value))}
+                    className="w-full p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-800 font-mono text-sm font-bold text-slate-900 dark:text-white"
+                  />
+                  <span className="text-slate-500 font-medium text-xs">menit</span>
+                </div>
+                <div className="flex items-center gap-1.5 pt-1 flex-wrap">
+                  {[150, 210, 280, 315, 420].map(val => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setTempWeeklyExerciseTarget(val)}
+                      className="px-2 py-0.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-[10px] font-bold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                    >
+                      {val} mnt {val === 150 ? "(WHO)" : ""}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setTempWeeklyExerciseTarget(tempExerciseTarget * 7)}
+                    className="px-2 py-0.5 rounded-lg bg-amber-500 text-slate-950 text-[10px] font-black shadow-xs"
+                    title="Gunakan 7 x Target Harian"
+                  >
+                    7x Harian ({tempExerciseTarget * 7}m)
+                  </button>
                 </div>
               </div>
             </div>

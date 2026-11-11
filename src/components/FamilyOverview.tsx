@@ -14,7 +14,9 @@ import { SmartHydrationWidget } from "./SmartHydrationWidget";
 import { DailyWellnessGoal } from "./DailyWellnessGoal";
 import { HealthGoals } from "./HealthGoals";
 import { ProactiveHealthAlertBanner } from "./ProactiveHealthAlertBanner";
+import { HariKesehatanIndonesiaBanner } from "./HariKesehatanIndonesiaBanner";
 import { ProactiveHealthAlertWidget } from "./ProactiveHealthAlertWidget";
+import { WeeklyExerciseTrendChart } from "./WeeklyExerciseTrendChart";
 import { ProactiveHealthAlert } from "../types/proactiveAlerts";
 import { 
   Heart, 
@@ -45,7 +47,8 @@ import {
   Database,
   WifiOff,
   Target,
-  Bell
+  Bell,
+  Dumbbell
 } from "lucide-react";
 
 interface FamilyOverviewProps {
@@ -70,6 +73,7 @@ interface FamilyOverviewProps {
   onOpenProactiveModal?: () => void;
   onTriggerGoalsReminderSimulation?: (slot: "10:00" | "20:00") => void;
   onOpenGoalsNotificationCenter?: () => void;
+  onOpenHariKesehatan?: () => void;
 }
 
 export const FamilyOverview: React.FC<FamilyOverviewProps> = ({
@@ -94,6 +98,7 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({
   onOpenProactiveModal,
   onTriggerGoalsReminderSimulation,
   onOpenGoalsNotificationCenter,
+  onOpenHariKesehatan,
 }) => {
 
   const activeMember = members.find(m => m.id === selectedMemberId) || members[0];
@@ -169,6 +174,14 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({
 
   return (
     <div className="space-y-6">
+
+      {/* Peringatan Hari Kesehatan Indonesia 12 November: Fit Mahkota Jihad */}
+      <HariKesehatanIndonesiaBanner
+        onOpenModal={onOpenHariKesehatan || (() => {})}
+        activeMember={activeMember}
+        onShowToast={onShowToast}
+        onNavigateToBerjaga={onNavigateToBerjaga}
+      />
       
       {/* Family Member Horizontal Selector Bar */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -583,6 +596,26 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({
               </div>
             </button>
 
+            {/* Tren Durasi Olahraga 7 Hari Recharts Shortcut */}
+            <button
+              onClick={() => {
+                const el = document.getElementById("exercise-duration-trends-section");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="flex items-center gap-3 p-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs shadow-md shadow-emerald-600/20 transition-all active:scale-98 cursor-pointer relative"
+            >
+              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                <Dumbbell className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-1">
+                  <p className="font-bold leading-tight">Tren Olahraga 7 Hari</p>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
+                </div>
+                <p className="text-[10px] text-emerald-100 font-normal">Recharts Durasi Tiap Anggota</p>
+              </div>
+            </button>
+
             {/* Sleep Quality & Morning Readiness Shortcut */}
             <button
               onClick={() => {
@@ -956,6 +989,21 @@ export const FamilyOverview: React.FC<FamilyOverviewProps> = ({
           onRunAiPrediction={onRunAiPrediction}
         />
       </div>
+
+      {/* FITUR VISUALISASI DATA RECHARTS: TREN DURASI OLAHRAGA 7 HARI UNTUK SETIAP ANGGOTA KELUARGA */}
+      <WeeklyExerciseTrendChart
+        members={members}
+        selectedMemberId={selectedMemberId}
+        onSelectMember={onSelectMember}
+        onSyncWearable={onSyncWearable}
+        isSyncing={isSyncing}
+        onShowToast={onShowToast}
+        onNavigateToBerjaga={onNavigateToBerjaga}
+        onNavigateToGoals={() => {
+          const el = document.getElementById("health-goals-section");
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
 
       {/* FITUR ANALISIS TREN KESEHATAN MINGGUAN (KOMPARASI VITAL SAAT INI VS RATA-RATA 7 HARI) */}
       <WeeklyVitalTrendAnalysis

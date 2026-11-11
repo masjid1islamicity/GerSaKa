@@ -16,6 +16,7 @@ import { OfflineEmergencyVault } from "./components/OfflineEmergencyVault";
 import { OfflineNotificationBanner } from "./components/OfflineNotificationBanner";
 import { IslamicityBerjagaView } from "./components/IslamicityBerjagaView";
 import { ProactiveHealthAlertModal } from "./components/ProactiveHealthAlertModal";
+import { HariKesehatanModal } from "./components/HariKesehatanModal";
 import { saveAllToOfflineCache } from "./utils/offlineStorage";
 import { ProactiveHealthAlert } from "./types/proactiveAlerts";
 import { 
@@ -134,6 +135,7 @@ export default function App() {
 
   // Health Goals Push Notification System (10 AM & 8 PM reminders for progress < 50%)
   const [isGoalsNotifDrawerOpen, setIsGoalsNotifDrawerOpen] = useState(false);
+  const [isHariKesehatanModalOpen, setIsHariKesehatanModalOpen] = useState(false);
   const {
     activeAlert: healthGoalsAlert,
     dismissAlert: dismissHealthGoalsAlert,
@@ -532,6 +534,7 @@ export default function App() {
         unreadNotifications={unreadAlertsCount}
         onOpenSymptomChecker={() => setIsSymptomCheckerOpen(true)}
         onOpenOfflineVault={() => setIsOfflineVaultOpen(true)}
+        onOpenHariKesehatan={() => setIsHariKesehatanModalOpen(true)}
       />
 
       {/* Persistent Offline Status Banner */}
@@ -564,6 +567,7 @@ export default function App() {
             onOpenProactiveModal={() => setIsProactiveAlertModalOpen(true)}
             onTriggerGoalsReminderSimulation={triggerGoalsReminderSimulation}
             onOpenGoalsNotificationCenter={() => setIsGoalsNotifDrawerOpen(true)}
+            onOpenHariKesehatan={() => setIsHariKesehatanModalOpen(true)}
           />
         )}
 
@@ -578,6 +582,7 @@ export default function App() {
             onNavigateToDoctor={() => setCurrentTab("doctor")}
             onSyncWearable={handleSyncWearable}
             isSyncing={isSyncing}
+            onOpenHariKesehatan={() => setIsHariKesehatanModalOpen(true)}
           />
         )}
 
@@ -832,6 +837,19 @@ export default function App() {
             const el = document.getElementById("health-goals-section");
             if (el) el.scrollIntoView({ behavior: "smooth" });
           }, 100);
+        }}
+      />
+
+      {/* 13. Peringatan Hari Kesehatan Indonesia (12 November) - Fit Mahkota Jihad Modal */}
+      <HariKesehatanModal
+        isOpen={isHariKesehatanModalOpen}
+        onClose={() => setIsHariKesehatanModalOpen(false)}
+        members={members}
+        selectedMemberId={selectedMemberId}
+        onShowToast={showToast}
+        onNavigateToBerjaga={() => {
+          setIsHariKesehatanModalOpen(false);
+          setCurrentTab("berjaga");
         }}
       />
 

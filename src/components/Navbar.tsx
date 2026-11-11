@@ -18,7 +18,8 @@ import {
   Landmark,
   Database,
   WifiOff,
-  Sparkles
+  Sparkles,
+  Crown
 } from "lucide-react";
 
 interface NavbarProps {
@@ -38,6 +39,7 @@ interface NavbarProps {
   wearableSyncCount: number;
   unreadNotifications: number;
   onOpenSymptomChecker?: () => void;
+  onOpenHariKesehatan?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -57,6 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   wearableSyncCount,
   unreadNotifications,
   onOpenSymptomChecker,
+  onOpenHariKesehatan,
 }) => {
   const cycleFontSize = () => {
     if (fontSize === "normal") setFontSize("large");
@@ -176,11 +179,24 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Right Action Icons & Controls */}
           <div className="flex items-center gap-2">
             
+            {/* Hari Kesehatan Indonesia (12 November) Commemoration Trigger */}
+            {onOpenHariKesehatan && (
+              <button
+                onClick={onOpenHariKesehatan}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black rounded-lg text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer active:scale-95"
+                title="Peringatan Hari Kesehatan Indonesia (12 November) - Fit Mahkota Jihad di Jalan Allah dengan Harta & Jiwaraga"
+              >
+                <Crown className="w-3.5 h-3.5 fill-slate-950" />
+                <span className="hidden sm:inline">12 Nov: Mahkota Jihad</span>
+                <span className="sm:hidden">12 Nov</span>
+              </button>
+            )}
+
             {/* Symptom Checker Trigger */}
             {onOpenSymptomChecker && (
               <button
                 onClick={onOpenSymptomChecker}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-bold border border-rose-200 dark:border-rose-800 transition-colors cursor-pointer"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-bold border border-rose-200 dark:border-rose-800 transition-colors cursor-pointer"
                 title="Pemeriksa Gejala Fisik AI & Triase Urgensi"
               >
                 <Stethoscope className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
